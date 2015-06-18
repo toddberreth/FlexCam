@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>C3C7C71B-B296-48D4-A613-21EE61A1AF76</string>
+	<key>IDESourceControlProjectName</key>
+	<string>FlexCam</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>D4CA8F82B07B6F97553E99810F19248506AB3F58</key>
+		<string>https://github.com/toddberreth/FlexCam.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>FlexCam.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>D4CA8F82B07B6F97553E99810F19248506AB3F58</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/toddberreth/FlexCam.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>D4CA8F82B07B6F97553E99810F19248506AB3F58</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>D4CA8F82B07B6F97553E99810F19248506AB3F58</string>
+			<key>IDESourceControlWCCName</key>
+			<string>FlexCam</string>
+		</dict>
+	</array>
+</dict>
+</plist>
