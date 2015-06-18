@@ -1,0 +1,6 @@
+ofxGui
+ofxKinect
+ofxOpenCv
+ofxOsc
+ofxXmlSettings
+ofxIpVideoGrabber

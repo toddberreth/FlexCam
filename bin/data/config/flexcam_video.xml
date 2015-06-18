@@ -1,0 +1,25 @@
+<global>
+    <name config="mediawall"></name>
+    <type inputtype="videos"></type>
+    <blob blobname="blob"></blob>
+    <canvas width="720" height="540"></canvas>
+    <roi roiminx="15" roiminy="59" roimaxx="709" roimaxy="470"></roi>
+    <modeinit configdisplay="false" stitchedmode="s" activeobject="1"></modeinit>
+    <autoback autoback="false"></autoback>
+</global>
+<processing>
+    <threshold threshold="10" thresholdmax="255"></threshold>
+    <blur blur="9" blurmax="9"></blur>
+    <dilate dilate="1" dilatemax="20"></dilate>
+    <erode erode="3" erodemax="20"></erode>
+    <blob filterminarea="100" filtermaxarea="500000" blobsmoothing="0.200000986"></blob>
+</processing>
+<ipcameras></ipcameras>
+<videos>
+    <video path="videos/0.mov" speed="0.500000000" width="720" height="480" posx="0" posy="20" roiminx="0" roiminy="0" roimaxx="720" roimaxy="480"></video>
+</videos>
+<localcamera>
+</localcamera>
+<osc>
+    <oscsend ip="127.0.0.1" port="57120"></oscsend>
+</osc>

@@ -1,0 +1,23 @@
+<global>
+    <name config="flexcam_default"></name>
+    <type inputtype="ipcameras"></type>
+    <blob blobname="blob"></blob>
+    <canvas width="960" height="540"></canvas>
+    <roi roiminx="0" roiminy="0" roimaxx="960" roimaxy="540"></roi>
+    <modeinit configdisplay="false" stitchedmode="s" activeobject="1"></modeinit>
+    <autoback autoback="false"></autoback>
+</global>
+<processing>
+    <threshold threshold="30" thresholdmax="255"></threshold>
+    <blur blur="3" blurmax="9"></blur>
+    <dilate dilate="3" dilatemax="20"></dilate>
+    <erode erode="3" erodemax="20"></erode>
+    <blob filterminarea="500" filtermaxarea="999900" blobsmoothing="0.200000003"></blob>
+</processing>
+<ipcameras></ipcameras>
+<videos></videos>
+<localcamera>
+</localcamera>
+<osc>
+    <oscsend ip="127.0.0.1" port="57120"></oscsend>
+</osc>
