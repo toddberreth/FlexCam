@@ -5,5 +5,7 @@ Flexible configuration via and .xml configuration file.
 
 FlexCam was written in C++ using openFrameworks 008+
 
+FlexCam required addon ofxIPVideoGrabber
+
 
 
