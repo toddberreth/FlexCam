@@ -4,24 +4,24 @@
 void flexcamApp::setup()
 {
     state = APP_JUST_LAUNCHED;
-    
+
     ofSetFrameRate(APP_FRAMERATE);
     ofSetVerticalSync(TRUE);
     ofSetWindowPosition(INIT_POSITION_X, INIT_POSITION_Y);
     ofBackground(0,0,0);
-    ofSetLogLevel(OF_LOG_VERBOSE);  //OF_LOG_SILENT
-    
+    ofSetLogLevel(OF_LOG_SILENT);  //OF_LOG_SILENT
+
     windowWidth = INFO_WINDOW_WIDTH; windowHeight = INFO_WINDOW_HEIGHT;
-    
+
     bProcessConfig = bLoadConfig = bLoadedConfig = bSaveConfig = bConfigDisplay = bCropROI = bLearnBackground = bConfigMoveObject = bShowLabels = bShowIPCamerasInfo = false;
     bShowFramerate = true;
-    
+
     setupMedia();
-    
+
     state = APP_WAITING_FOR_CONFIG;
-    
+
     if (AUTOLOAD_CONFIG) autoLoadConfig(DEFAULT_CONFIG);
-    
+
 }
 
 //--------------------------------------------------------------
@@ -29,20 +29,20 @@ void flexcamApp::update()
 {
     ofSetWindowShape(windowWidth, windowHeight);
     ofSetWindowTitle(currentData.configName + "- fps: " + ofToString(ofGetFrameRate(),2));
-    
+
     if (state != APP_WAITING_FOR_CONFIG){
-        
+
         if (currentData.configType == "ipcameras")		updateIPCameras();
         if (currentData.configType == "localcamera")    updateLocalCamera();
         if (currentData.configType == "videos")			updateVideos();
-        
+
         if (!bConfigDisplay){
-            
+
             updateStitchedImage();
             updateProcessedImage();
             updateBlobTracking();
             updateOscSend();
-            
+
             if (currentData.bAutoBackgrounding) updateAutoBackgrounding();
             if (currentData.configType == "videos")		state = APP_VIDEOS;
             if (currentData.configType == "ipcameras")	state = APP_IP_CAMERAS;
@@ -53,7 +53,7 @@ void flexcamApp::update()
         }
 
     }
-    
+
     if (bProcessConfig) processConfigFile();
     if (bLoadConfig) loadConfig();
     if (bSaveConfig) saveConfig();
@@ -63,12 +63,12 @@ void flexcamApp::update()
 void flexcamApp::draw()
 {
     drawInfo();
-    
-    
+
+
     if (state != APP_WAITING_FOR_CONFIG){
-        
+
         if (!bConfigDisplay) {
-            
+
             drawImage();
             if (bShowLabels) drawRunROI();
             if (bShowIPCamerasInfo) drawIPCamerasInfo();
@@ -86,10 +86,10 @@ void flexcamApp::exit()
 //--------------------------------------------------------------
 void flexcamApp::keyPressed(int key)
 {
-    
-    
+
+
     if (bConfigDisplay){
-        
+
         if (((int)key >= 49) && ((int)key <= 57)) {if (((int)key - 48)<= currentData.numberObjects) {currentData.activeObject = (int)key - 49;}}
         if ((currentData.activeObject + 1) <= currentData.numberObjects){
             switch (key){case 'm': bConfigMoveObject = !bConfigMoveObject; break;}
@@ -97,7 +97,7 @@ void flexcamApp::keyPressed(int key)
     }
     else{
         switch (key){
-                
+
             case 'b': bLearnBackground = true; break;									// learn background
             case 'x': bCropROI = !bCropROI; break;
             case '=': if (currentData.threshold >= currentData.thresholdMax) currentData.threshold = currentData.thresholdMax; else currentData.threshold++; break;
@@ -115,13 +115,13 @@ void flexcamApp::keyPressed(int key)
             case 'n': currentData.blobSmoothing =  currentData.blobSmoothing - BLOB_SMOOTHING_STEP; if (currentData.blobSmoothing < 0) currentData.blobSmoothing = 0; break;
             case 'm': currentData.blobSmoothing =  currentData.blobSmoothing + BLOB_SMOOTHING_STEP; if (currentData.blobSmoothing > 1) currentData.blobSmoothing = 1; break;
             case 'B': currentData.bAutoBackgrounding = !currentData.bAutoBackgrounding; break;
-                
+
             case 'w': if (currentData.configType == "ipcameras") bShowIPCamerasInfo = ! bShowIPCamerasInfo;
         }
     }
-    
+
     switch (key){
-            
+
         case 'r': bConfigDisplay = false; cvSet(stitchedGrayImage.getCvImage(), cvScalar(0,0,0)); break;
         case 'c': bConfigDisplay = true; break;
         case 's': currentData.stitchedDisplayMode = 's'; bConfigDisplay = false; break;									// color display
@@ -138,52 +138,52 @@ void flexcamApp::mouseMoved(int x, int y ){}
 //--------------------------------------------------------------
 void flexcamApp::mouseDragged(int x, int y, int button)
 {
-    
+
     x = x - INFO_WINDOW_WIDTH;
-    
+
     if (bConfigDisplay){
-        
+
         if(bConfigMoveObject){
-            
+
             if (currentData.configType == "videos"){
-                
+
                 if(((currentData.videos[currentData.activeObject].videoPosX+currentData.videos[currentData.activeObject].videoRoiMinX +(x-startMoveObjectX)) >= 0) &&
                    ((currentData.videos[currentData.activeObject].videoPosX+currentData.videos[currentData.activeObject].videoRoiMaxX+(x-startMoveObjectX))  <= (currentData.canvasWidth)))
                 { currentData.videos[currentData.activeObject].videoPosX = currentData.videos[currentData.activeObject].videoPosX + (x-startMoveObjectX);}
-                
+
                 if(((currentData.videos[currentData.activeObject].videoPosY+currentData.videos[currentData.activeObject].videoRoiMinY+(y-startMoveObjectY)) >= 0) &&
                    ((currentData.videos[currentData.activeObject].videoPosY+currentData.videos[currentData.activeObject].videoRoiMaxY+(y-startMoveObjectY)) <= (currentData.canvasHeight)))
                 { currentData.videos[currentData.activeObject].videoPosY = currentData.videos[currentData.activeObject].videoPosY + (y-startMoveObjectY);}
             }
-            
+
             if (currentData.configType == "ipcameras"){
-                
+
                 if(((currentData.IPCameras[currentData.activeObject].camPosX+currentData.IPCameras[currentData.activeObject].camRoiMinX +(x-startMoveObjectX)) >= 0) &&
                    ((currentData.IPCameras[currentData.activeObject].camPosX+currentData.IPCameras[currentData.activeObject].camRoiMaxX+(x-startMoveObjectX))  <= (currentData.canvasWidth)))
                 { currentData.IPCameras[currentData.activeObject].camPosX = currentData.IPCameras[currentData.activeObject].camPosX + (x-startMoveObjectX);}
-                
+
                 if(((currentData.IPCameras[currentData.activeObject].camPosY+currentData.IPCameras[currentData.activeObject].camRoiMinY+(y-startMoveObjectY)) >= 0) &&
                    ((currentData.IPCameras[currentData.activeObject].camPosY+currentData.IPCameras[currentData.activeObject].camRoiMaxY+(y-startMoveObjectY)) <= (currentData.canvasHeight)))
                 { currentData.IPCameras[currentData.activeObject].camPosY = currentData.IPCameras[currentData.activeObject].camPosY + (y-startMoveObjectY);}
             }
-            
+
             if (currentData.configType == "localcamera"){
-                
+
                 if(((currentData.localCamera.localPosX+currentData.localCamera.localRoiMinX +(x-startMoveObjectX)) >= 0) &&
                    ((currentData.localCamera.localPosX+currentData.localCamera.localRoiMaxX+(x-startMoveObjectX))  <= (currentData.canvasWidth)))
                 { currentData.localCamera.localPosX = currentData.localCamera.localPosX + (x-startMoveObjectX);}
-                
+
                 if(((currentData.localCamera.localPosY+currentData.localCamera.localRoiMinY+(y-startMoveObjectY)) >= 0) &&
                    ((currentData.localCamera.localPosY+currentData.localCamera.localRoiMaxY+(y-startMoveObjectY)) <= (currentData.canvasHeight)))
                 { currentData.localCamera.localPosY = currentData.localCamera.localPosY + (y-startMoveObjectY);}
             }
-            
+
             startMoveObjectX = x; startMoveObjectY=y;
         }
         else{
-            
+
             if (currentData.configType == "videos"){
-                
+
                 if (((x >= currentData.videos[currentData.activeObject].videoPosX+currentData.videos[currentData.activeObject].videoRoiMinX) &&
                      (x <= currentData.videos[currentData.activeObject].videoPosX+currentData.videos[currentData.activeObject].videoWidth))
                     && ((y >= currentData.videos[currentData.activeObject].videoPosY+currentData.videos[currentData.activeObject].videoRoiMinY) &&
@@ -193,9 +193,9 @@ void flexcamApp::mouseDragged(int x, int y, int button)
                     currentData.videos[currentData.activeObject].videoRoiMaxY  = (y - currentData.videos[currentData.activeObject].videoPosY);
                 }
             }
-            
+
             if (currentData.configType == "ipcameras"){
-                
+
                 if (((x >= currentData.IPCameras[currentData.activeObject].camPosX+currentData.IPCameras[currentData.activeObject].camRoiMinX) &&
                      (x <= currentData.IPCameras[currentData.activeObject].camPosX+currentData.IPCameras[currentData.activeObject].camWidth))
                     && ((y >= currentData.IPCameras[currentData.activeObject].camPosY+currentData.IPCameras[currentData.activeObject].camRoiMinY) &&
@@ -205,9 +205,9 @@ void flexcamApp::mouseDragged(int x, int y, int button)
                     currentData.IPCameras[currentData.activeObject].camRoiMaxY  = (y - currentData.IPCameras[currentData.activeObject].camPosY);
                 }
             }
-            
+
             if (currentData.configType == "localcamera"){
-                
+
                 if (((x >= currentData.localCamera.localPosX+currentData.localCamera.localRoiMinX) &&
                      (x <= currentData.localCamera.localPosX+currentData.localCamera.localWidth))
                     && ((y >= currentData.localCamera.localPosY+currentData.localCamera.localRoiMinY) &&
@@ -220,10 +220,10 @@ void flexcamApp::mouseDragged(int x, int y, int button)
         }
     }
     else {
-        
+
         if (x < runROIStartX) {currentData.runROIMinX = x; currentData.runROIMaxX = runROIStartX;}
         else {currentData.runROIMaxX = x; currentData.runROIMinX = runROIStartX;}
-        
+
         if (y < runROIStartY) {currentData.runROIMinY = y; currentData.runROIMaxY = runROIStartY;}
         else {currentData.runROIMaxY = y; currentData.runROIMinY = runROIStartY;}
     }
@@ -232,25 +232,25 @@ void flexcamApp::mouseDragged(int x, int y, int button)
 void flexcamApp::mousePressed(int x, int y, int button)
 {
     x = x - INFO_WINDOW_WIDTH;
-    
+
     if (button == 0){
-        
+
         if (bConfigDisplay){
             if(bConfigMoveObject){startMoveObjectX = x; startMoveObjectY=y;}
             else{
-                
+
                 if (currentData.configType == "videos"){
                     if (((x >= currentData.videos[currentData.activeObject].videoPosX) && (x <= currentData.videos[currentData.activeObject].videoPosX+currentData.videos[currentData.activeObject].videoWidth))
                         && ((y >= currentData.videos[currentData.activeObject].videoPosY) && (y <=currentData.videos[currentData.activeObject].videoPosY+currentData.videos[currentData.activeObject].videoHeight)))
                     {currentData.videos[currentData.activeObject].videoRoiMinX = x - currentData.videos[currentData.activeObject].videoPosX; currentData.videos[currentData.activeObject].videoRoiMinY = y-currentData.videos[currentData.activeObject].videoPosY;}
                 }
-                
+
                 if (currentData.configType == "cameras"){
                     if (((x >= currentData.IPCameras[currentData.activeObject].camPosX) && (x <= currentData.IPCameras[currentData.activeObject].camPosX+currentData.IPCameras[currentData.activeObject].camWidth))
                         && ((y >= currentData.IPCameras[currentData.activeObject].camPosY) && (y <=currentData.IPCameras[currentData.activeObject].camPosY+currentData.IPCameras[currentData.activeObject].camHeight)))
                     {currentData.IPCameras[currentData.activeObject].camRoiMinX = x - currentData.IPCameras[currentData.activeObject].camPosX; currentData.IPCameras[currentData.activeObject].camRoiMinY = y-currentData.IPCameras[currentData.activeObject].camPosY;}
                 }
-                
+
                 if (currentData.configType == "local"){
                     if (((x >= currentData.localCamera.localPosX) && (x <= currentData.localCamera.localPosX+currentData.localCamera.localWidth))
                         && ((y >= currentData.localCamera.localPosY) && (y <=currentData.localCamera.localPosY+currentData.localCamera.localHeight)))
@@ -269,7 +269,7 @@ void flexcamApp::windowResized(int w, int h){}
 void flexcamApp::gotMessage(ofMessage msg){}
 
 //--------------------------------------------------------------
-void flexcamApp::dragEvent(ofDragInfo dragInfo){ 
+void flexcamApp::dragEvent(ofDragInfo dragInfo){
 
     if( dragInfo.files.size() == 1){
         string filename = ofFilePath::getFileName(dragInfo.files[0]);

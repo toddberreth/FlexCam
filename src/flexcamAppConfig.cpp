@@ -30,7 +30,7 @@ void flexcamApp::autoLoadConfig(string path)
 
 //--------------------------------------------------------------
 void flexcamApp::processConfigFile(){
-    
+
     bProcessConfig = false;
     if (bLoadedConfig) clearAllData();
     currentXML = processXML;
@@ -40,9 +40,9 @@ void flexcamApp::processConfigFile(){
 
 //--------------------------------------------------------------
 void flexcamApp::loadConfig(){
-    
+
     bLoadConfig = false;
-    
+
     currentXML.pushTag("global");
         currentData.configName              = currentXML.getAttribute("name", "config", "");
         currentData.configType              = currentXML.getAttribute("type", "inputtype", "");
@@ -58,7 +58,7 @@ void flexcamApp::loadConfig(){
         currentData.activeObject            = (currentXML.getAttribute("modeinit", "activeobject", 1) - 1);
         currentData.bAutoBackgrounding      = ofToBool(currentXML.getAttribute("autoback", "autoback", "false"));
     currentXML.popTag();
-    
+
     currentXML.pushTag("processing");
         currentData.threshold               = currentXML.getAttribute("threshold", "threshold", 0);
         currentData.thresholdMax            = currentXML.getAttribute("threshold", "thresholdmax", 255);
@@ -72,17 +72,17 @@ void flexcamApp::loadConfig(){
         currentData.blobMaxArea             = currentXML.getAttribute("blob", "filtermaxarea", 999999.0);
         currentData.blobSmoothing           = currentXML.getAttribute("blob", "blobsmoothing", 0.2);
     currentXML.popTag();
-    
+
     windowWidth = INFO_WINDOW_WIDTH + currentData.canvasWidth; windowHeight = currentData.canvasHeight;
     if (windowWidth < MIN_WINDOW_WIDTH) windowWidth = MIN_WINDOW_WIDTH; if (windowHeight < MIN_WINDOW_HEIGHT) windowHeight = MIN_WINDOW_HEIGHT;
-    
+
     string tag;
-        
+
     currentXML.pushTag("ipcameras");
         tag = "camera";
         int numIPCams = currentXML.getNumTags(tag);
         for(int n = 0; n < numIPCams; n++){
-            
+
             IPCameraData newCameraData;
             newCameraData.camName = currentXML.getAttribute(tag, "name", "", n);
             newCameraData.camIP = currentXML.getAttribute(tag, "ip", "", n);
@@ -98,7 +98,7 @@ void flexcamApp::loadConfig(){
             newCameraData.camRoiMinY = currentXML.getAttribute(tag, "roiminy", 0, n);
             newCameraData.camRoiMaxX = currentXML.getAttribute(tag, "roimaxx", DEFAULT_IP_CAM_WIDTH, n);
             newCameraData.camRoiMaxY = currentXML.getAttribute(tag, "roimaxy", DEFAULT_IP_CAM_HEIGHT, n);
-            
+
             if (currentData.configType == "ipcameras"){
                 flexcamIPCam newCam(newCameraData.camName,newCameraData.camIP, newCameraData.camType, newCameraData.camUsername,newCameraData.camPassword,
                                     newCameraData.camWidth,newCameraData.camHeight,newCameraData.camPosX,newCameraData.camPosY,
@@ -117,14 +117,14 @@ void flexcamApp::loadConfig(){
         }
     currentXML.popTag();
 
-    
+
     if (currentData.configType == "ipcameras") {state = APP_IP_CAMERAS; currentData.numberObjects = currentData.IPCameras.size();}
 
     currentXML.pushTag("videos");
     tag = "video";
     int numVideos = currentXML.getNumTags(tag);
     for(int n = 0; n < numVideos; n++){
-        
+
         videoData newVideoData;
         newVideoData.videoPath = currentXML.getAttribute(tag, "path", "", n);
         newVideoData.videoSpeed = currentXML.getAttribute(tag, "speed", 1.0, n);
@@ -136,12 +136,13 @@ void flexcamApp::loadConfig(){
         newVideoData.videoRoiMinY = currentXML.getAttribute(tag, "roiminy", 0, n);
         newVideoData.videoRoiMaxX = currentXML.getAttribute(tag, "roimaxx", DEFAULT_IP_CAM_WIDTH, n);
         newVideoData.videoRoiMaxY = currentXML.getAttribute(tag, "roimaxy", DEFAULT_IP_CAM_HEIGHT, n);
-        
+
         if (currentData.configType == "videos"){
             ofVideoPlayer newVideo;
             newVideo.loadMovie(newVideoData.videoPath);
             newVideo.setSpeed(1.0);
             newVideo.play();
+            newVideo.setLoopState(OF_LOOP_NORMAL);
             videos.push_back(newVideo);
             newVideoData.videoFrameImage.allocate(newVideoData.videoWidth, newVideoData.videoHeight);
             newVideoData.videoFrameGrayImage.allocate(newVideoData.videoWidth, newVideoData.videoHeight);
@@ -149,7 +150,7 @@ void flexcamApp::loadConfig(){
             newVideoData.videoFrameLastImage.allocate(newVideoData.videoWidth, newVideoData.videoHeight);
             newVideoData.videoFrameActivityImage.allocate(newVideoData.videoWidth, newVideoData.videoHeight);
         }
-        
+
         bool newFrame = false;
         bNewVideoFrame.push_back(newFrame);
         newVideoData.activityLevel = 0;
@@ -158,7 +159,7 @@ void flexcamApp::loadConfig(){
     currentXML.popTag();
 
     if (currentData.configType == "videos") { currentData.numberObjects = currentData.videos.size(); state = APP_VIDEOS;}
-    
+
     currentXML.pushTag("localcamera");
         currentData.localCamera.localWidth = currentXML.getAttribute("camera", "width", 640);
         currentData.localCamera.localHeight = currentXML.getAttribute("camera", "height", 480);
@@ -169,7 +170,7 @@ void flexcamApp::loadConfig(){
         currentData.localCamera.localRoiMaxX = currentXML.getAttribute("camera", "roimaxx", currentData.localCamera.localWidth);
         currentData.localCamera.localRoiMaxY = currentXML.getAttribute("camera", "roimaxy", currentData.localCamera.localHeight);
     currentXML.popTag();
-    
+
     if (currentData.configType == "localcamera"){
         bNewLocalFrame = false;
         localCamera.initGrabber(currentData.localCamera.localWidth,currentData.localCamera.localHeight);
@@ -182,7 +183,7 @@ void flexcamApp::loadConfig(){
         state = APP_LOCAL_CAMERA;
         currentData.numberObjects = 1; currentData.activeObject = 0;
     }
-    
+
     currentXML.pushTag("osc");
         tag = "oscsend";
         int numOSCSends = currentXML.getNumTags(tag);
@@ -197,11 +198,11 @@ void flexcamApp::loadConfig(){
     currentXML.popTag();
 
     if (currentData.bConfigDisplay == true) {
-        
+
         bConfigDisplay = currentData.bConfigDisplay;
         state = APP_CONFIGURE_LAYOUT;
     }
-    
+
     stitchedGrayImage.allocate(currentData.canvasWidth,currentData.canvasHeight);
     backgroundGrayImage.allocate(currentData.canvasWidth,currentData.canvasHeight);
     croppedStitchedGrayImage.allocate(currentData.canvasWidth,currentData.canvasHeight);
@@ -211,17 +212,17 @@ void flexcamApp::loadConfig(){
     dataImage.allocate(currentData.canvasWidth,currentData.canvasHeight);
     chB.allocate(currentData.canvasWidth,currentData.canvasHeight);
     labelImage 	= cvCreateImage(cvSize(currentData.canvasWidth,currentData.canvasHeight), IPL_DEPTH_LABEL, 1);
-    
+
     bShowLabels = bLoadedConfig = true;
     noMotionTimer = 0;
 }
 
 //--------------------------------------------------------------
 void flexcamApp::saveConfig(){
-    
+
     bSaveConfig = false;
     ofxXmlSettings saveXML;
-    
+
     saveXML.addTag("global");
     saveXML.pushTag("global");
         saveXML.addTag("name");
@@ -265,7 +266,7 @@ void flexcamApp::saveConfig(){
             saveXML.addAttribute("blob", "filtermaxarea", currentData.blobMaxArea, 0);
             saveXML.addAttribute("blob", "blobsmoothing", currentData.blobSmoothing, 0);
     saveXML.popTag();
-    
+
     saveXML.addTag("ipcameras");
     saveXML.pushTag("ipcameras");
         for (int i = 0; i < currentData.IPCameras.size(); i++){
@@ -286,7 +287,7 @@ void flexcamApp::saveConfig(){
             saveXML.addAttribute("camera", "roimaxy", currentData.IPCameras[i].camRoiMaxY , i);
         }
     saveXML.popTag();
-    
+
     saveXML.addTag("videos");
     saveXML.pushTag("videos");
     for (int i = 0; i < currentData.videos.size(); i++){
@@ -303,7 +304,7 @@ void flexcamApp::saveConfig(){
         saveXML.addAttribute("video", "roimaxy", currentData.videos[i].videoRoiMaxY , i);
     }
     saveXML.popTag();
-    
+
     saveXML.addTag("localcamera");
     saveXML.pushTag("localcamera");
         saveXML.addTag("camera");
@@ -325,17 +326,17 @@ void flexcamApp::saveConfig(){
         saveXML.addAttribute("oscsend", "port", currentData.oscSends[i].port , i);
     }
     saveXML.popTag();
-    
+
     saveXML.saveFile(currentPath);
 }
 
 
 //--------------------------------------------------------------
 void flexcamApp::clearAllData(){
-    
+
     //clear IP cameras
     for (int i = 0; i < currentData.IPCameras.size(); i++ ){
-     
+
         currentData.IPCameras[i].camFrameGrayImage.clear();
         currentData.IPCameras[i].camFrameCurrentImage.clear();
         currentData.IPCameras[i].camFrameLastImage.clear();
@@ -347,21 +348,21 @@ void flexcamApp::clearAllData(){
 
     //clear videos
     for (int i = 0; i < currentData.videos.size(); i++ ){
-        
+
         currentData.videos[i].videoFrameImage.clear();
         currentData.videos[i].videoFrameGrayImage.clear();
     }
     currentData.videos.clear();
     videos.clear();
     bNewVideoFrame.clear();
-    
+
     //clear local camera
     currentData.localCamera.localFrameImage.clear();
     currentData.localCamera.localFrameGrayImage.clear();
     currentData.localCamera.localFrameCurrentImage.clear();
     currentData.localCamera.localFrameLastImage.clear();
     currentData.localCamera.localFrameActivityImage.clear();
-    
+
     // initialize global variables
     currentData.configName = currentData.configType = currentData.blobName = "";
     currentData.canvasWidth = currentData.canvasHeight = 0;
@@ -372,7 +373,7 @@ void flexcamApp::clearAllData(){
     currentData.stitchedDisplayMode = NULL;
     currentData.bConfigDisplay = false;
     currentData.bAutoBackgrounding = false;
-    
+
     //clear
     stitchedGrayImage.clear();
     backgroundGrayImage.clear();
@@ -383,11 +384,11 @@ void flexcamApp::clearAllData(){
     dataImage.clear();
     chB.clear();
     if (labelImage != NULL) cvReleaseImage(&labelImage);
-    
+
     oscSends.clear();
     currentData.oscSends.clear();
 
-    
+
 }
 
 
