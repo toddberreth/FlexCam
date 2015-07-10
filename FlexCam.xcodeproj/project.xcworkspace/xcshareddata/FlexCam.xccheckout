@@ -10,6 +10,8 @@
 	<string>FlexCam</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>AECFBD561E27AA75142CC3760E6EF1774F14CD24</key>
+		<string>https://github.com/loveandsheep/ofxIpVideoGrabber.git</string>
 		<key>D4CA8F82B07B6F97553E99810F19248506AB3F58</key>
 		<string>https://github.com/toddberreth/FlexCam.git</string>
 	</dict>
@@ -17,6 +19,8 @@
 	<string>FlexCam.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>AECFBD561E27AA75142CC3760E6EF1774F14CD24</key>
+		<string>../../../../../addons/ofxIpVideoGrabber</string>
 		<key>D4CA8F82B07B6F97553E99810F19248506AB3F58</key>
 		<string>../..</string>
 	</dict>
@@ -35,6 +39,14 @@
 			<string>D4CA8F82B07B6F97553E99810F19248506AB3F58</string>
 			<key>IDESourceControlWCCName</key>
 			<string>FlexCam</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>AECFBD561E27AA75142CC3760E6EF1774F14CD24</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ofxIpVideoGrabber</string>
 		</dict>
 	</array>
 </dict>
