@@ -1,4 +1,3 @@
-*.mode1v3
 
 # xcode
 *.pbxuser
@@ -10,6 +9,7 @@ build
 
 # OSX
 .DS_Store
+*.app
 
 # codeblocks
 *.layout
